@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
+using Contracts.Domain;
+using Service.Contracts;
+
+namespace Service
+{
+    internal sealed class EmployeeService : IEmployeeService
+    {
+        private readonly IRepositoryManager _repository;
+        private readonly IMapper _mapper;
+
+        public EmployeeService(IRepositoryManager repository, IMapper mapper)
+        {
+            _repository = repository;
+            _mapper = mapper;
+        }
+    }
+}
+
