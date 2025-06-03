@@ -24,6 +24,7 @@ namespace Entites.Domain.Models
         [Required(ErrorMessage = "Position is a required field.")]
         [MaxLength(20, ErrorMessage = "Maximum length for the Position is 20 Characters.")] 
     public string? Position { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         [ForeignKey(nameof(Company))]
         public Guid CompanyId { get; set; }
