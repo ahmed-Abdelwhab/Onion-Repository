@@ -10,7 +10,7 @@ namespace Shared.DataTransferObjects
     public record class EmployeeForUpdateDto : EmployeeForManipulationDto
     {
         public string Name { get; init; }
-        [Required]
+        [Required(ErrorMessage ="aaaa")]
         [Range(18, 65)]
 
         public int Age { get; init; }

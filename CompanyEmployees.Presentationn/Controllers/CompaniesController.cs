@@ -36,10 +36,12 @@ _service.CompanyService.GetAllCompaniesAsync(trackChanges: false);
             false); return Ok(company);
         }
         [HttpPost]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+
         public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
         {
-            if (company is null)
-                return BadRequest("CompanyForCreationDto object is null");
+            //if (company is null)
+            //    return BadRequest("CompanyForCreationDto object is null");
             var createdCompany = await _service.CompanyService.CreateCompanyAsync(company);
             return CreatedAtRoute("CompanyById", new { id = createdCompany.Id },
             createdCompany);

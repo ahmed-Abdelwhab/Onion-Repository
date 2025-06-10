@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Contracts.Domain;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Entites.Domain.ErrorModel;
 using Entites.Domain.Models;
 using Service.Contracts;
@@ -30,7 +31,7 @@ namespace Service
 
         public async Task<CompanyDto> GetCompanyAsync(Guid id, bool trackChanges)
         {
-            var company = await _repository.Company.GetCompanyAsync(id, trackChanges);
+            var company = await GetCompanyAndCheckIfItExists(id, trackChanges);
             if (company is null)
                 throw new CompanyNotFoundException(id);
 
@@ -48,14 +49,12 @@ namespace Service
 
             return companyToReturn;
         }
-        public async Task<IEnumerable<CompanyDto>> GetByIdsAsync(IEnumerable<Guid> ids, bool
-trackChanges)
+        public async Task<IEnumerable<CompanyDto>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges)
         {
             if (ids is null)
                 throw new IdParametersBadRequestException();
 
-            var companyEntities = await _repository.Company.GetByIdsAsync(ids,
-           trackChanges);
+            var companyEntities = await _repository.Company.GetByIdsAsync(ids, trackChanges);
             if (ids.Count() != companyEntities.Count())
                 throw new CollectionByIdsBadRequestException();
 
@@ -63,9 +62,7 @@ trackChanges)
 
             return companiesToReturn;
         }
-        public async Task<(IEnumerable<CompanyDto> companies, string ids)>
-CreateCompanyCollectionAsync
- (IEnumerable<CompanyForCreationDto> companyCollection)
+        public async Task<(IEnumerable<CompanyDto> companies, string ids)>CreateCompanyCollectionAsync(IEnumerable<CompanyForCreationDto> companyCollection)
         {
             if (companyCollection is null)
                 throw new CompanyCollectionBadRequest();
@@ -84,16 +81,24 @@ CreateCompanyCollectionAsync
 
             return (companies: companyCollectionToReturn, ids: ids);
         }
-        public async Task DeleteCompanyAsync(Guid companyId, bool trackChanges)
+        public async Task DeleteCompanyAsync(Guid id, bool trackChanges)
         {
 
-            var company = await _repository.Company.GetCompanyAsync(companyId,
- trackChanges);
+            var company = await GetCompanyAndCheckIfItExists(id, trackChanges);
+
             if (company is null)
-                throw new CompanyNotFoundException(companyId);
+                throw new CompanyNotFoundException(id);
             _repository.Company.DeleteCompany(company);
             await _repository.SaveAsync();
         }
+        private async Task<Company> GetCompanyAndCheckIfItExists(Guid id, bool trackChanges)
+        {
+            var company = await _repository.Company.GetCompanyAsync(id, trackChanges);
+            if (company is null)
+                throw new CompanyNotFoundException(id);
+            return company;
+        }
+
     }
-    
+
 }

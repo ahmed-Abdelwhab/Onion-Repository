@@ -21,6 +21,7 @@ builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddSingleton<ILoggerManager, LoggerManager>();
 
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddScoped<ValidationFilterAttribute>();
 
 builder.Services.AddControllers(config => {
     config.RespectBrowserAcceptHeader = true;
