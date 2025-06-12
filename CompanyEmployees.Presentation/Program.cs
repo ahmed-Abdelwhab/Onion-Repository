@@ -5,6 +5,10 @@ using NLog;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Contracts.Domain;
+using Service.DataShaping;
+using Shared.DataTransferObjects;
+using CompanyEmployees.Presentationn;
 
 var builder = WebApplication.CreateBuilder(args);
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
@@ -19,9 +23,11 @@ builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddSingleton<ILoggerManager, LoggerManager>();
-
+builder.Services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
+    
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<ValidationFilterAttribute>();
+builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 
 builder.Services.AddControllers(config => {
     config.RespectBrowserAcceptHeader = true;
@@ -32,6 +38,8 @@ builder.Services.AddControllers(config => {
 .AddXmlDataContractSerializerFormatters()
 .AddCustomCSVFormatter()
 .AddApplicationPart(typeof(CompanyEmployees.Presentationn.AssemblyReference).Assembly);
+builder.Services.AddCustomMediaTypes();
+
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
