@@ -1,4 +1,5 @@
-﻿using Contracts.Domain;
+﻿using AspNetCoreRateLimit;
+using Contracts.Domain;
 using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -43,6 +44,27 @@ namespace CompanyEmployees.Extensions
                     .Add("application/vnd.codemaze.hateoas+xml");
                 }
             });
+        }
+        public static void ConfigureRateLimitingOptions(this IServiceCollection services)
+        {
+            var rateLimitRules = new List<RateLimitRule>
+{
+new RateLimitRule
+{
+Endpoint = "*",
+Limit = 3,
+Period = "5m"
+}
+};
+            services.Configure<IpRateLimitOptions>(opt => {
+                opt.GeneralRules =
+            rateLimitRules;
+            });
+            services.AddSingleton<IRateLimitCounterStore,
+            MemoryCacheRateLimitCounterStore>();
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
         }
         public static void ConfigureVersioning(this IServiceCollection services)
         {

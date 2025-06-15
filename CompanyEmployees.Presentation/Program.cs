@@ -1,14 +1,15 @@
+using AspNetCoreRateLimit;
 using CompanyEmployees.Extensions;
-using Service.Contracts;
-using Service;
-using NLog;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Mvc.Formatters;
+using CompanyEmployees.Presentationn;
 using Contracts.Domain;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Options;
+using NLog;
+using Service;
+using Service.Contracts;
 using Service.DataShaping;
 using Shared.DataTransferObjects;
-using CompanyEmployees.Presentationn;
 
 var builder = WebApplication.CreateBuilder(args);
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
@@ -32,7 +33,9 @@ builder.Services.ConfigureHttpCacheHeaders();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.AddScoped<ValidateMediaTypeAttribute>();
-
+builder.Services.AddMemoryCache();
+builder.Services.ConfigureRateLimitingOptions();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers(config => {
     config.RespectBrowserAcceptHeader = true;
     config.ReturnHttpNotAcceptable = true;
@@ -64,6 +67,7 @@ if (app.Environment.IsProduction())
 app.UseAuthorization();
 app.UseResponseCaching();
 app.UseHttpCacheHeaders();
+app.UseIpRateLimiting();
 
 app.MapControllers();
 
