@@ -1,16 +1,18 @@
-﻿using System;
+﻿using CompanyEmployees.Presentationn.ModelBinders;
+using Marvin.Cache.Headers;
+using Microsoft.AspNetCore.Mvc;
+using Service.Contracts;
+using Shared.DataTransferObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using CompanyEmployees.Presentationn.ModelBinders;
-using Microsoft.AspNetCore.Mvc;
-using Service.Contracts;
-using Shared.DataTransferObjects;
 
 namespace CompanyEmployees.Presentationn.Controllers
 {
+    [ApiVersion("1.0")]
 
     [Route("api/companies")]
     [ApiController]
@@ -19,6 +21,8 @@ namespace CompanyEmployees.Presentationn.Controllers
         private readonly IServiceManager _service;
         public CompaniesController(IServiceManager service) => _service = service;
         [HttpGet]
+        //[ResponseCache(CacheProfileName = "120SecondsDuration")]
+
         public async Task<IActionResult> GetCompanies()
         {
 
@@ -29,7 +33,15 @@ _service.CompanyService.GetAllCompaniesAsync(trackChanges: false);
 
 
         }
+        [HttpOptions]
+        public IActionResult GetCompaniesOptions()
+        {
+            Response.Headers.Add("Allow", "GET, OPTIONS, POST");
+            return Ok();
+        }
         [HttpGet("{id:guid}", Name = "CompanyById")]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
+        [HttpCacheValidation(MustRevalidate = false)]
         public async Task<IActionResult> GetCompany(Guid id)
         {
             var company = await _service.CompanyService.GetCompanyAsync(id, trackChanges:

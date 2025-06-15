@@ -21,6 +21,8 @@ namespace CompanyEmployees.Presentationn.Controllers
         public EmployeesController(IServiceManager service) => _service = service;
 
         [HttpGet]
+        [HttpHead]
+
         [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
 
         public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)

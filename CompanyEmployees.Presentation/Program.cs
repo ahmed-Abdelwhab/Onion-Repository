@@ -24,7 +24,11 @@ builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddSingleton<ILoggerManager, LoggerManager>();
 builder.Services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
-    
+builder.Services.ConfigureVersioning();
+builder.Services.ConfigureResponseCaching();
+builder.Services.AddResponseCaching();
+builder.Services.ConfigureHttpCacheHeaders();
+
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.AddScoped<ValidateMediaTypeAttribute>();
@@ -33,6 +37,10 @@ builder.Services.AddControllers(config => {
     config.RespectBrowserAcceptHeader = true;
     config.ReturnHttpNotAcceptable = true;
     config.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
+    config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
+    {
+        Duration =120
+    });
 
 }).AddNewtonsoftJson()
 .AddXmlDataContractSerializerFormatters()
@@ -54,6 +62,8 @@ if (app.Environment.IsProduction())
     app.UseHsts();
 
 app.UseAuthorization();
+app.UseResponseCaching();
+app.UseHttpCacheHeaders();
 
 app.MapControllers();
 
