@@ -31,11 +31,12 @@ builder.Services.AddResponseCaching();
 builder.Services.ConfigureHttpCacheHeaders();
 
 builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 builder.Services.AddMemoryCache();
 builder.Services.ConfigureRateLimitingOptions();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddAuthentication();
+builder.Services.ConfigureIdentity();
 builder.Services.AddControllers(config => {
     config.RespectBrowserAcceptHeader = true;
     config.ReturnHttpNotAcceptable = true;
@@ -49,6 +50,8 @@ builder.Services.AddControllers(config => {
 .AddXmlDataContractSerializerFormatters()
 .AddCustomCSVFormatter()
 .AddApplicationPart(typeof(CompanyEmployees.Presentationn.AssemblyReference).Assembly);
+builder.Services.AddScoped<ValidationFilterAttribute>();
+
 builder.Services.AddCustomMediaTypes();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -63,6 +66,7 @@ var logger = app.Services.GetRequiredService<ILoggerManager>();
 app.ConfigureExceptionHandler(logger);
 if (app.Environment.IsProduction())
     app.UseHsts();
+app.UseAuthentication();
 
 app.UseAuthorization();
 app.UseResponseCaching();

@@ -1,6 +1,8 @@
 ﻿using AspNetCoreRateLimit;
 using Contracts.Domain;
+using Entites.Domain.Models;
 using Marvin.Cache.Headers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -52,7 +54,7 @@ namespace CompanyEmployees.Extensions
 new RateLimitRule
 {
 Endpoint = "*",
-Limit = 3,
+Limit = 10,
 Period = "5m"
 }
 };
@@ -76,6 +78,20 @@ Period = "5m"
                 opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
 
             });
+        }
+        public static void ConfigureIdentity(this IServiceCollection services)
+        {
+            var builder = services.AddIdentity<User, IdentityRole>(o =>
+            {
+                o.Password.RequireDigit = true;
+                o.Password.RequireLowercase = false;
+                o.Password.RequireUppercase = false;
+                o.Password.RequireNonAlphanumeric = false;
+                o.Password.RequiredLength = 10;
+                o.User.RequireUniqueEmail = true;
+            })
+            .AddEntityFrameworkStores<RepositoryContext>()
+            .AddDefaultTokenProviders();
         }
         public static void ConfigureResponseCaching(this IServiceCollection services) =>
 services.AddResponseCaching();
