@@ -1,5 +1,6 @@
 ﻿using CompanyEmployees.Presentationn.ModelBinders;
 using Marvin.Cache.Headers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects;
@@ -21,7 +22,8 @@ namespace CompanyEmployees.Presentationn.Controllers
         private readonly IServiceManager _service;
         public CompaniesController(IServiceManager service) => _service = service;
         [HttpGet]
-        //[ResponseCache(CacheProfileName = "120SecondsDuration")]
+        [Authorize]
+        [Authorize(Roles = "Manager")]
 
         public async Task<IActionResult> GetCompanies()
         {
